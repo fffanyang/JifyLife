@@ -173,81 +173,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 选中日期概览 — 点击整个卡片跳转 */}
-          <button
-            onClick={() => selectedDiary
-              ? navigate(`/diary?date=${selectedDate}`)
-              : navigate(`/edit?date=${selectedDate}`)
-            }
-            className="card w-full p-5 text-left active:scale-[0.98] transition-all animate-slide-up"
-            style={{ animationDelay: '60ms' }}
-          >
-            <div className="flex items-center justify-between mb-2.5">
-              <div>
-                <div className="text-[16px] font-bold text-[var(--color-text)] tracking-wide">
-                  {selectedDate === today ? '今天' : selectedDate.slice(5).replace('-', '月') + '日'}
-                </div>
-                <div className="text-[12px] text-[var(--color-text-muted)] mt-0.5 font-medium">
-                  {getWeekday(selectedDate)}
-                  {selectedDiary && (
-                    <span className="ml-1.5">
-                      {WEATHER_OPTIONS.find(w => w.label === selectedDiary.weather)?.icon} {selectedDiary.weather}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <ChevronRight size={18} strokeWidth={2} className="text-[var(--color-text-hint)]" />
-            </div>
-
-            {selectedDiary ? (
-              <div className="space-y-3">
-                {/* 模块标签 */}
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { key: 'work', label: '工作', filled: !!selectedDiary.work.trim() },
-                    { key: 'study', label: '学习', filled: !!selectedDiary.study.trim() },
-                    { key: 'fitness', label: '运动', filled: !!selectedDiary.fitness.trim() },
-                    { key: 'expense', label: '消费', filled: !!selectedDiary.expense.trim() },
-                    { key: 'mood', label: '心情', filled: !!selectedDiary.mood.trim() },
-                    { key: 'sleep', label: '作息', filled: !!(selectedDiary.wakeUp || selectedDiary.sleep) },
-                  ].map(m => (
-                    <span
-                      key={m.key}
-                      className={`px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide transition-colors ${
-                        m.filled
-                          ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)] border border-[rgba(156,123,86,0.1)]'
-                          : 'bg-[var(--color-bg)] text-[var(--color-text-hint)]'
-                      }`}
-                    >
-                      {m.label}
-                    </span>
-                  ))}
-                </div>
-                {/* 摘要文字 */}
-                <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed line-clamp-2">
-                  {[selectedDiary.work, selectedDiary.study, selectedDiary.expense]
-                    .filter(s => s?.trim())
-                    .map(s => s.split(/[,，、\n]/)[0].trim())
-                    .join(' · ') || '日记已保存'}
-                </p>
-                {/* 作息 */}
-                {(selectedDiary.wakeUp || selectedDiary.sleep) && (
-                  <div className="text-[12px] text-[var(--color-text-muted)] font-medium">
-                    {selectedDiary.wakeUp && `${selectedDiary.wakeUp} 起`}
-                    {selectedDiary.wakeUp && selectedDiary.sleep && ' · '}
-                    {selectedDiary.sleep && `${selectedDiary.sleep} 睡`}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="py-1">
-                <p className="text-[13px] text-[var(--color-text-hint)]">
-                  这一天还没有记录，点击开始写
-                </p>
-              </div>
-            )}
-          </button>
-
           {/* 最近日记列表 */}
           {!loading && recentDiaries.length > 0 && (
             <div className="animate-slide-up" style={{ animationDelay: '120ms' }}>
@@ -295,7 +220,7 @@ export default function HomePage() {
         {/* 渐变遮罩：避免内容被按钮硬切 */}
         <div className="h-8 bg-gradient-to-t from-[var(--color-bg)] to-transparent" />
         <div className="bg-[var(--color-bg)] pb-safe-bottom">
-          <div className="max-w-lg mx-auto px-5 pb-6 flex justify-center">
+          <div className="max-w-lg mx-auto px-5 pb-6 flex flex-col items-center gap-2">
             {(() => {
               const isToday = selectedDate === today;
               const hasDiary = !!selectedDiary;
@@ -304,17 +229,31 @@ export default function HomePage() {
                 : `${parseInt(selectedDate.slice(5, 7))}月${parseInt(selectedDate.slice(8))}日`;
 
               if (hasDiary) {
+                // 生成摘要
+                const parts: string[] = [];
+                if (selectedDiary.work?.trim()) parts.push(selectedDiary.work.trim().split(/[,，、\n]/)[0]);
+                if (selectedDiary.study?.trim()) parts.push(selectedDiary.study.trim().split(/[,，、\n]/)[0]);
+                if (selectedDiary.expense?.trim()) parts.push(selectedDiary.expense.trim().split(/[,，、\n]/)[0]);
+                const snippet = parts.join(' · ');
+
                 return (
-                  <button
-                    key={`view-${selectedDate}`}
-                    onClick={() => navigate(`/diary?date=${selectedDate}`)}
-                    className="record-btn record-btn-view pointer-events-auto animate-scale-in"
-                  >
-                    <Eye size={19} strokeWidth={2} className="relative z-10" />
-                    <span className="relative z-10 text-[15px] font-bold tracking-[0.06em]">
-                      查看{dateLabel}
-                    </span>
-                  </button>
+                  <>
+                    {snippet && (
+                      <p className="text-[11px] text-[var(--color-text-hint)] font-medium truncate max-w-[280px] pointer-events-auto animate-fade-in">
+                        {snippet}
+                      </p>
+                    )}
+                    <button
+                      key={`view-${selectedDate}`}
+                      onClick={() => navigate(`/diary?date=${selectedDate}`)}
+                      className="record-btn record-btn-view pointer-events-auto animate-scale-in"
+                    >
+                      <Eye size={19} strokeWidth={2} className="relative z-10" />
+                      <span className="relative z-10 text-[15px] font-bold tracking-[0.06em]">
+                        查看{dateLabel}
+                      </span>
+                    </button>
+                  </>
                 );
               } else {
                 return (
