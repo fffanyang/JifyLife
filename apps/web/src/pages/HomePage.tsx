@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PenLine, BarChart3, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { PenLine, Eye, BarChart3, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useDiaryStore } from '@/stores/diaryStore';
 import { getDiary, formatDate, getWeekday } from '@/services/diaryService';
 import type { DiaryEntry } from '@/types/diary';
@@ -173,9 +173,16 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 选中日期概览 */}
-          <div className="card p-5 animate-slide-up" style={{ animationDelay: '60ms' }}>
-            <div className="flex items-center justify-between mb-3.5">
+          {/* 选中日期概览 — 点击整个卡片跳转 */}
+          <button
+            onClick={() => selectedDiary
+              ? navigate(`/diary?date=${selectedDate}`)
+              : navigate(`/edit?date=${selectedDate}`)
+            }
+            className="card w-full p-5 text-left active:scale-[0.98] transition-all animate-slide-up"
+            style={{ animationDelay: '60ms' }}
+          >
+            <div className="flex items-center justify-between mb-2.5">
               <div>
                 <div className="text-[16px] font-bold text-[var(--color-text)] tracking-wide">
                   {selectedDate === today ? '今天' : selectedDate.slice(5).replace('-', '月') + '日'}
@@ -189,19 +196,7 @@ export default function HomePage() {
                   )}
                 </div>
               </div>
-              <button
-                onClick={() => selectedDiary
-                  ? navigate(`/diary?date=${selectedDate}`)
-                  : navigate(`/edit?date=${selectedDate}`)
-                }
-                className={`px-5 py-2.5 rounded-[14px] text-[13px] font-semibold transition-all active:scale-95 ${
-                  selectedDiary
-                    ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)] border border-[rgba(156,123,86,0.12)]'
-                    : 'bg-[var(--color-brand)] text-white shadow-[0_2px_8px_rgba(26,22,20,0.15)]'
-                }`}
-              >
-                {selectedDiary ? '查看详情' : '开始记录'}
-              </button>
+              <ChevronRight size={18} strokeWidth={2} className="text-[var(--color-text-hint)]" />
             </div>
 
             {selectedDiary ? (
@@ -245,13 +240,13 @@ export default function HomePage() {
                 )}
               </div>
             ) : (
-              <div className="py-2">
+              <div className="py-1">
                 <p className="text-[13px] text-[var(--color-text-hint)]">
-                  这一天还没有记录
+                  这一天还没有记录，点击开始写
                 </p>
               </div>
             )}
-          </div>
+          </button>
 
           {/* 最近日记列表 */}
           {!loading && recentDiaries.length > 0 && (
@@ -295,17 +290,49 @@ export default function HomePage() {
         </div>
       </main>
 
-      {/* 底部居中记录按钮 */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 pointer-events-none pb-safe-bottom">
-        <div className="max-w-lg mx-auto px-5 pb-7 flex justify-center">
-          <button
-            onClick={() => navigate(`/edit?date=${today}`)}
-            className="record-btn pointer-events-auto"
-          >
-            <span className="record-btn-glow" />
-            <PenLine size={20} strokeWidth={2.2} className="relative z-10" />
-            <span className="relative z-10 text-[15px] font-bold tracking-[0.08em]">记录今天</span>
-          </button>
+      {/* 底部智能按钮 — 根据选中日期动态变化 */}
+      <div className="fixed bottom-0 left-0 right-0 z-20 pointer-events-none">
+        {/* 渐变遮罩：避免内容被按钮硬切 */}
+        <div className="h-8 bg-gradient-to-t from-[var(--color-bg)] to-transparent" />
+        <div className="bg-[var(--color-bg)] pb-safe-bottom">
+          <div className="max-w-lg mx-auto px-5 pb-6 flex justify-center">
+            {(() => {
+              const isToday = selectedDate === today;
+              const hasDiary = !!selectedDiary;
+              const dateLabel = isToday
+                ? '今天'
+                : `${parseInt(selectedDate.slice(5, 7))}月${parseInt(selectedDate.slice(8))}日`;
+
+              if (hasDiary) {
+                return (
+                  <button
+                    key={`view-${selectedDate}`}
+                    onClick={() => navigate(`/diary?date=${selectedDate}`)}
+                    className="record-btn record-btn-view pointer-events-auto animate-scale-in"
+                  >
+                    <Eye size={19} strokeWidth={2} className="relative z-10" />
+                    <span className="relative z-10 text-[15px] font-bold tracking-[0.06em]">
+                      查看{dateLabel}
+                    </span>
+                  </button>
+                );
+              } else {
+                return (
+                  <button
+                    key={`edit-${selectedDate}`}
+                    onClick={() => navigate(`/edit?date=${selectedDate}`)}
+                    className="record-btn pointer-events-auto animate-scale-in"
+                  >
+                    <span className="record-btn-glow" />
+                    <PenLine size={19} strokeWidth={2.2} className="relative z-10" />
+                    <span className="relative z-10 text-[15px] font-bold tracking-[0.06em]">
+                      记录{dateLabel}
+                    </span>
+                  </button>
+                );
+              }
+            })()}
+          </div>
         </div>
       </div>
     </div>

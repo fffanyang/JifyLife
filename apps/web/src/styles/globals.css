@@ -432,6 +432,23 @@ input[type="time"] {
     0 4px 16px rgba(26, 22, 20, 0.1);
 }
 
+/* 查看模式 — 柔和的琥珀金风格 */
+.record-btn-view {
+  background: linear-gradient(135deg, #F5F0E8 0%, #EDE5D8 50%, #F5F0E8 100%);
+  color: var(--color-accent);
+  box-shadow:
+    0 2px 10px rgba(156, 123, 86, 0.12),
+    0 8px 28px rgba(156, 123, 86, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(156, 123, 86, 0.12);
+}
+
+.record-btn-view:active {
+  box-shadow:
+    0 1px 4px rgba(156, 123, 86, 0.1),
+    0 2px 8px rgba(156, 123, 86, 0.06);
+}
+
 /* 琥珀金光晕效果 */
 .record-btn-glow {
   position: absolute;
