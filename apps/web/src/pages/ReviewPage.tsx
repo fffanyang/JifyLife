@@ -5,9 +5,9 @@ import { generateReview } from '@/services/diaryService';
 import type { ReviewData, ReviewPeriod } from '@/types/diary';
 
 const PERIOD_LABELS: Record<ReviewPeriod, string> = {
-  week: '周回顾',
-  month: '月回顾',
-  year: '年回顾',
+  week: '周',
+  month: '月',
+  year: '年',
 };
 
 export default function ReviewPage() {
@@ -38,41 +38,45 @@ export default function ReviewPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)]">
-      {/* 顶部 */}
+      {/* 顶部导航 — 返回 + 周期切换 */}
       <header className="glass-header sticky top-0 z-30">
-        <div className="flex items-center justify-between px-4 h-14">
-          <button onClick={() => navigate('/')} className="w-10 h-10 rounded-xl flex items-center justify-center text-[var(--color-text-secondary)] active:text-[var(--color-text)] active:bg-[var(--color-bg)] transition-all">
-            <ChevronLeft size={22} strokeWidth={2} />
+        <div className="max-w-lg mx-auto flex items-center justify-between px-5 h-14">
+          <button onClick={() => navigate('/')} className="header-icon-btn">
+            <ChevronLeft size={20} strokeWidth={2} />
           </button>
-          <div className="text-[15px] font-bold text-[var(--color-text)] tracking-wider">回顾</div>
-          <div className="w-10" />
+          <div className="flex items-center gap-1">
+            {(['week', 'month', 'year'] as ReviewPeriod[]).map(p => (
+              <button
+                key={p}
+                onClick={() => { setPeriod(p); setRefDate(new Date()); }}
+                className={`px-4 py-1.5 rounded-full text-[12px] font-bold transition-all active:scale-95 tracking-wide ${
+                  period === p
+                    ? 'bg-[var(--color-brand)] text-white'
+                    : 'text-[var(--color-text-muted)]'
+                }`}
+              >
+                {PERIOD_LABELS[p]}
+              </button>
+            ))}
+          </div>
+          <div className="w-[38px]" />
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-5 py-6">
-        {/* 周期切换 */}
-        <div className="flex items-center justify-center gap-2.5 mb-5">
-          {(['week', 'month', 'year'] as ReviewPeriod[]).map(p => (
-            <button
-              key={p}
-              onClick={() => { setPeriod(p); setRefDate(new Date()); }}
-              className={`pill transition-all active:scale-95 ${
-                period === p ? 'pill-active' : 'pill-inactive'
-              }`}
-            >
-              {PERIOD_LABELS[p]}
-            </button>
-          ))}
-        </div>
-
+      <main className="max-w-lg mx-auto px-5 py-6 space-y-4">
         {/* 时间段导航 */}
-        <div className="flex items-center justify-center gap-4 mb-6">
+        <div className="flex items-center justify-between px-1 animate-fade-in">
           <button onClick={() => navigatePeriod(-1)} className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--color-text-muted)] active:text-[var(--color-text)] active:bg-[var(--color-bg)] transition-all">
             <ChevronLeft size={18} strokeWidth={2} />
           </button>
-          <span className="text-[12px] text-[var(--color-text-secondary)] font-medium min-w-[180px] text-center tracking-wide">
-            {review?.dateRange || ''}
-          </span>
+          <div className="text-center">
+            <div className="text-[15px] font-bold text-[var(--color-text)] tracking-wide">
+              {review?.title || ''}
+            </div>
+            <div className="text-[11px] text-[var(--color-text-muted)] font-medium mt-0.5">
+              {review ? (review.diaryCount > 0 ? `${review.dateRange} · ${review.diaryCount} 天` : review.dateRange) : ''}
+            </div>
+          </div>
           <button onClick={() => navigatePeriod(1)} className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--color-text-muted)] active:text-[var(--color-text)] active:bg-[var(--color-bg)] transition-all">
             <ChevronRight size={18} strokeWidth={2} />
           </button>
@@ -82,100 +86,80 @@ export default function ReviewPage() {
           <div className="flex items-center justify-center py-24">
             <div className="text-[var(--color-text-hint)] text-[13px] font-medium animate-[gentlePulse_1.5s_ease-in-out_infinite]">加载中…</div>
           </div>
-        ) : review ? (
-          <div ref={cardRef} className="share-card animate-scale-in">
-            {/* 卡片标题 */}
-            <div className="share-card-header">
-              <h2 className="text-[22px] font-bold text-[var(--color-text)] tracking-wide leading-tight">
-                {review.title}
-              </h2>
-              <div className="text-[12px] text-[var(--color-text-muted)] mt-2 font-medium">
-                {review.diaryCount > 0 ? `共记录 ${review.diaryCount} 天` : '暂无日记记录'}
+        ) : review && review.diaryCount > 0 ? (
+          <div ref={cardRef} className="space-y-4 animate-slide-up">
+            {/* 作息统计 */}
+            <div className="card p-5">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-7 h-7 rounded-[10px] bg-[var(--color-accent-soft)] flex items-center justify-center">
+                  <span className="text-[13px]">🌙</span>
+                </div>
+                <h3 className="text-[13px] font-bold text-[var(--color-text)] tracking-wide">作息</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <StatCard label="平均起床" value={review.sleepStats.avgWakeUp} icon="☀️" />
+                <StatCard label="平均入睡" value={review.sleepStats.avgSleep} icon="🌙" />
+                <StatCard label="平均睡眠" value={review.sleepStats.avgDuration} icon="💤" />
+                <StatCard
+                  label="最晚熬夜"
+                  value={review.sleepStats.latestSleep.time}
+                  sub={review.sleepStats.latestSleep.date ? review.sleepStats.latestSleep.date.slice(5) : ''}
+                  icon="🦉"
+                />
               </div>
             </div>
 
-            <div className="share-card-body space-y-7">
-              {/* 作息统计 */}
-              <ReviewSection icon="🌙" title="作息">
-                <div className="grid grid-cols-2 gap-3">
-                  <StatCard label="平均起床" value={review.sleepStats.avgWakeUp} icon="☀️" />
-                  <StatCard label="平均入睡" value={review.sleepStats.avgSleep} icon="🌙" />
-                  <StatCard label="平均睡眠" value={review.sleepStats.avgDuration} icon="💤" />
-                  <StatCard
-                    label="最晚熬夜"
-                    value={review.sleepStats.latestSleep.time}
-                    sub={review.sleepStats.latestSleep.date ? review.sleepStats.latestSleep.date.slice(5) : ''}
-                    icon="🦉"
-                  />
+            {/* 记录统计 */}
+            <div className="card p-5">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-7 h-7 rounded-[10px] bg-[var(--color-accent-soft)] flex items-center justify-center">
+                  <span className="text-[13px]">📊</span>
                 </div>
-              </ReviewSection>
-
-              <div className="divider" />
-
-              {/* 事务统计 */}
-              <ReviewSection icon="📊" title="记录统计">
-                <div className="grid grid-cols-3 gap-3">
-                  <CountCard label="工作" value={review.taskStats.totalWork} color="#9C7B56" />
-                  <CountCard label="学习" value={review.taskStats.totalStudy} color="#5E9E6E" />
-                  <CountCard label="运动" value={review.taskStats.totalFitness} color="#6B8EBE" />
-                  <CountCard label="消费" value={review.taskStats.totalExpense} color="#C17A5A" />
-                  <CountCard label="心情" value={review.taskStats.totalMood} color="#A0856E" />
-                </div>
-              </ReviewSection>
-
-              {/* 消费高频 */}
-              {review.lifeStats.topItems.length > 0 && (
-                <>
-                  <div className="divider" />
-                  <ReviewSection icon="✨" title="消费高频">
-                    <div className="flex flex-wrap gap-2.5">
-                      {review.lifeStats.topItems.map((item, i) => (
-                        <span
-                          key={i}
-                          className="px-4 py-2 bg-[var(--color-bg)] text-[var(--color-text-secondary)] text-[12px] rounded-full font-semibold border border-[rgba(26,22,20,0.05)]"
-                        >
-                          {item}
-                        </span>
-                      ))}
-                    </div>
-                  </ReviewSection>
-                </>
-              )}
-
-              <div className="divider" />
-
-              {/* 一句话总结 */}
-              <div className="py-2">
-                <p className="text-[14px] text-[var(--color-text-secondary)] leading-[1.9] text-center italic">
-                  「{review.summary}」
-                </p>
+                <h3 className="text-[13px] font-bold text-[var(--color-text)] tracking-wide">记录统计</h3>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <CountCard label="今日事" value={review.taskStats.totalEvents} color="#9C7B56" />
+                <CountCard label="吃喝" value={review.taskStats.totalFood} color="#D4915E" />
+                <CountCard label="灵感" value={review.taskStats.totalIdeas} color="#C4A35A" />
+                <CountCard label="阅读" value={review.taskStats.totalReading} color="#5E9E6E" />
+                <CountCard label="工作" value={review.taskStats.totalWork} color="#A0856E" />
+                <CountCard label="心情" value={review.taskStats.totalMood} color="#6B8EBE" />
               </div>
             </div>
 
-            {/* 水印 */}
-            <div className="share-card-footer">
-              人生日记
+            {/* 吃喝高频 */}
+            {review.lifeStats.topItems.length > 0 && (
+              <div className="card p-5">
+                <div className="flex items-center gap-2.5 mb-4">
+                  <div className="w-7 h-7 rounded-[10px] bg-[var(--color-accent-soft)] flex items-center justify-center">
+                    <span className="text-[13px]">✨</span>
+                  </div>
+                  <h3 className="text-[13px] font-bold text-[var(--color-text)] tracking-wide">吃喝高频</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {review.lifeStats.topItems.map((item, i) => (
+                    <span
+                      key={i}
+                      className="px-3.5 py-1.5 bg-[var(--color-bg)] text-[var(--color-text-secondary)] text-[12px] rounded-full font-semibold"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 总结 */}
+            <div className="px-2 py-4 text-center">
+              <p className="text-[13px] text-[var(--color-text-muted)] leading-relaxed italic">
+                「{review.summary}」
+              </p>
             </div>
           </div>
         ) : (
           <div className="text-center py-24 text-[var(--color-text-hint)] text-[13px] font-medium">暂无数据</div>
         )}
       </main>
-    </div>
-  );
-}
-
-/** 分区标题 */
-function ReviewSection({ icon, title, children }: { icon: string; title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <div className="flex items-center gap-2.5 mb-4">
-        <div className="w-7 h-7 rounded-lg bg-[var(--color-accent-soft)] flex items-center justify-center">
-          <span className="text-[13px]">{icon}</span>
-        </div>
-        <h3 className="text-[13px] font-bold text-[var(--color-text)] tracking-[0.12em]">{title}</h3>
-      </div>
-      {children}
     </div>
   );
 }

@@ -14,10 +14,11 @@ export default function EditPage() {
   const { currentDiary, save, loadDiary, setDate, remove, currentDate } = useDiaryStore();
 
   const [weather, setWeather] = useState('晴');
+  const [events, setEvents] = useState('');
+  const [food, setFood] = useState('');
+  const [ideas, setIdeas] = useState('');
+  const [reading, setReading] = useState('');
   const [work, setWork] = useState('');
-  const [study, setStudy] = useState('');
-  const [fitness, setFitness] = useState('');
-  const [expense, setExpense] = useState('');
   const [mood, setMood] = useState('');
   const [wakeUp, setWakeUp] = useState('');
   const [sleep, setSleep] = useState('');
@@ -35,20 +36,22 @@ export default function EditPage() {
   useEffect(() => {
     if (currentDiary) {
       setWeather(currentDiary.weather || '晴');
+      setEvents(currentDiary.events || '');
+      setFood(currentDiary.food || '');
+      setIdeas(currentDiary.ideas || '');
+      setReading(currentDiary.reading || '');
       setWork(currentDiary.work || '');
-      setStudy(currentDiary.study || '');
-      setFitness(currentDiary.fitness || '');
-      setExpense(currentDiary.expense || '');
       setMood(currentDiary.mood || '');
       setWakeUp(currentDiary.wakeUp || '');
       setSleep(currentDiary.sleep || '');
       setImages(currentDiary.images || []);
     } else {
       setWeather('晴');
+      setEvents('');
+      setFood('');
+      setIdeas('');
+      setReading('');
       setWork('');
-      setStudy('');
-      setFitness('');
-      setExpense('');
       setMood('');
       setWakeUp('');
       setSleep('');
@@ -80,7 +83,7 @@ export default function EditPage() {
 
   const handleSave = async () => {
     const entry: Omit<DiaryEntry, 'createdAt' | 'updatedAt'> = {
-      date: currentDate, weather, work, study, fitness, expense, mood, wakeUp, sleep, images,
+      date: currentDate, weather, events, food, ideas, reading, work, mood, wakeUp, sleep, images,
     };
     await save(entry);
     setSaved(true);
@@ -97,9 +100,9 @@ export default function EditPage() {
   };
 
   const fieldSetters: Record<string, React.Dispatch<React.SetStateAction<string>>> = {
-    work: setWork, study: setStudy, fitness: setFitness, expense: setExpense, mood: setMood,
+    events: setEvents, food: setFood, ideas: setIdeas, reading: setReading, work: setWork, mood: setMood,
   };
-  const fieldValues: Record<string, string> = { work, study, fitness, expense, mood };
+  const fieldValues: Record<string, string> = { events, food, ideas, reading, work, mood };
 
   const weekday = getWeekday(currentDate);
   const relative = getRelativeDate(currentDate);
@@ -109,37 +112,36 @@ export default function EditPage() {
     <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
       {/* 顶部导航 */}
       <header className="glass-header sticky top-0 z-30">
-        <div className="flex items-center justify-between px-4 h-14">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-xl flex items-center justify-center text-[var(--color-text-secondary)] active:text-[var(--color-text)] active:bg-[var(--color-bg)] transition-all">
-            <ChevronLeft size={22} strokeWidth={2} />
+        <div className="max-w-lg mx-auto flex items-center justify-between px-5 h-14">
+          <button onClick={() => navigate(-1)} className="header-icon-btn">
+            <ChevronLeft size={20} strokeWidth={2} />
           </button>
           <div className="flex items-center gap-2">
             <button onClick={() => goDay(-1)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--color-text-hint)] active:text-[var(--color-text)] transition-colors">
               <ChevronLeft size={16} strokeWidth={2} />
             </button>
-            <div className="text-center min-w-[130px]">
+            <div className="text-center min-w-[100px]">
               <input
                 type="date"
                 value={currentDate}
                 onChange={(e) => {
                   if (e.target.value) navigate(`/edit?date=${e.target.value}`, { replace: true });
                 }}
-                className="text-[15px] font-bold text-[var(--color-text)] bg-transparent border-none text-center cursor-pointer outline-none tracking-wide"
+                className="text-[14px] font-bold text-[var(--color-text)] bg-transparent border-none text-center cursor-pointer outline-none tracking-wide w-full"
               />
-              <div className="text-[11px] text-[var(--color-text-muted)] font-medium -mt-0.5">{relative} {weekday}</div>
+              <div className="text-[10px] text-[var(--color-text-muted)] font-medium -mt-0.5">{relative} {weekday}</div>
             </div>
             <button onClick={() => goDay(1)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--color-text-hint)] active:text-[var(--color-text)] transition-colors">
               <ChevronRight size={16} strokeWidth={2} />
             </button>
           </div>
-          <div className="flex items-center">
-            {currentDiary && (
-              <button onClick={handleDelete} className="w-10 h-10 rounded-xl flex items-center justify-center text-[var(--color-text-hint)] active:text-[var(--color-danger)] transition-colors">
-                <Trash2 size={18} strokeWidth={1.8} />
-              </button>
-            )}
-            {!currentDiary && <div className="w-10" />}
-          </div>
+          {currentDiary ? (
+            <button onClick={handleDelete} className="header-icon-btn text-[var(--color-text-hint)] active:!text-[var(--color-danger)]">
+              <Trash2 size={18} strokeWidth={1.8} />
+            </button>
+          ) : (
+            <div className="w-[38px]" />
+          )}
         </div>
       </header>
 
@@ -277,21 +279,21 @@ export default function EditPage() {
       </main>
 
       {/* 底部保存栏 */}
-      <div className="fixed bottom-0 left-0 right-0 glass-header safe-bottom" style={{ borderTop: '1px solid rgba(26,22,20,0.05)', borderBottom: 'none' }}>
-        <div className="max-w-lg mx-auto px-5 py-3.5">
+      <div className="fixed bottom-0 left-0 right-0 z-20 bg-[var(--color-bg)] pb-safe-bottom" style={{ borderTop: '1px solid rgba(26,22,20,0.06)' }}>
+        <div className="max-w-lg mx-auto px-5 py-3">
           <button
             onClick={handleSave}
             disabled={saved}
-            className={`w-full py-4 rounded-[var(--radius-button)] font-bold text-[14px] flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] tracking-wide ${
+            className={`w-full py-3.5 rounded-[var(--radius-button)] font-bold text-[14px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] tracking-wide ${
               saved
-                ? 'btn-success'
-                : 'btn-primary'
+                ? 'bg-[var(--color-success)] text-white'
+                : 'bg-[var(--color-brand)] text-white shadow-[0_2px_8px_rgba(26,22,20,0.12)]'
             }`}
           >
             {saved ? (
-              <><Check size={18} strokeWidth={2.5} /><span>已保存</span></>
+              <><Check size={17} strokeWidth={2.5} /><span>已保存</span></>
             ) : (
-              <><Save size={18} strokeWidth={2} /><span>保存日记</span></>
+              <><Save size={17} strokeWidth={2} /><span>保存日记</span></>
             )}
           </button>
         </div>

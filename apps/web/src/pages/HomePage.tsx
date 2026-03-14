@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, BarChart3, Settings, ChevronLeft, ChevronRight, CalendarDays, Plus } from 'lucide-react';
+import { Eye, BarChart3, Settings, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useDiaryStore } from '@/stores/diaryStore';
 import { getDiary, formatDate, getWeekday } from '@/services/diaryService';
 import type { DiaryEntry } from '@/types/diary';
@@ -87,10 +87,17 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
-      {/* 顶部标题栏 */}
+      {/* 顶部标题栏 — 左回顾 右设置 */}
       <header className="glass-header sticky top-0 z-30">
         <div className="max-w-lg mx-auto px-5 pt-safe-top">
-          <div className="flex items-center justify-center h-14">
+          <div className="flex items-center justify-between h-14">
+            <button
+              onClick={() => navigate('/review')}
+              className="header-icon-btn"
+              aria-label="回顾"
+            >
+              <BarChart3 size={20} strokeWidth={1.6} />
+            </button>
             <div className="flex flex-col items-center">
               <h1 className="text-[16px] font-bold text-[var(--color-text)] tracking-[0.12em]">
                 人生日记
@@ -99,12 +106,19 @@ export default function HomePage() {
                 JIFYLIFE
               </span>
             </div>
+            <button
+              onClick={() => navigate('/settings')}
+              className="header-icon-btn"
+              aria-label="设置"
+            >
+              <Settings size={20} strokeWidth={1.6} />
+            </button>
           </div>
         </div>
       </header>
 
       {/* 主内容 */}
-      <main className="flex-1 overflow-y-auto pb-28">
+      <main className="flex-1 overflow-y-auto pb-24">
         <div className="max-w-lg mx-auto px-5 py-6 space-y-5">
 
           {/* 日历卡片 */}
@@ -116,9 +130,11 @@ export default function HomePage() {
               </button>
               <div className="text-center">
                 <div className="text-[16px] font-bold text-[var(--color-text)] tracking-wider">{monthLabel}</div>
-                <div className="text-[11px] text-[var(--color-text-muted)] mt-1 font-medium">
-                  {monthDiaryCount > 0 ? `已记录 ${monthDiaryCount} 天` : '开始记录吧'}
-                </div>
+                {monthDiaryCount > 0 && (
+                  <div className="text-[11px] text-[var(--color-text-muted)] mt-1 font-medium">
+                    已记录 {monthDiaryCount} 天
+                  </div>
+                )}
               </div>
               <button onClick={() => changeMonth(1)} className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--color-text-muted)] active:text-[var(--color-text)] active:bg-[var(--color-bg)] transition-all">
                 <ChevronRight size={18} strokeWidth={2} />
@@ -156,6 +172,17 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* 选中日期的日记预览（点击日历有日记的日期时展示） */}
+          {selectedDiary && (
+            <div className="animate-scale-in">
+              <DiaryCard
+                diary={selectedDiary}
+                isToday={selectedDiary.date === today}
+                onClick={() => navigate(`/diary?date=${selectedDiary.date}`)}
+              />
+            </div>
+          )}
+
           {/* 最近日记列表 */}
           {!loading && recentDiaries.length > 0 && (
             <div className="animate-slide-up" style={{ animationDelay: '120ms' }}>
@@ -179,82 +206,36 @@ export default function HomePage() {
               </div>
             </div>
           )}
-
-          {/* 空状态 */}
-          {!loading && recentDiaries.length === 0 && (
-            <div className="text-center py-16 animate-fade-in">
-              <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-[var(--color-brand-soft)] flex items-center justify-center">
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-[var(--color-text-muted)]">
-                  <path d="M4 5h14l5 5v14a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.5"/>
-                  <path d="M9 12h10M9 17h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <div className="text-[var(--color-text-secondary)] text-[14px] font-semibold mb-1.5">还没有日记</div>
-              <div className="text-[var(--color-text-hint)] text-[12px]">
-                点击下方按钮开始记录你的一天
-              </div>
-            </div>
-          )}
         </div>
       </main>
 
-      {/* 底部导航栏 */}
-      <nav className="fixed bottom-0 left-0 right-0 z-20">
-        <div className="nav-bar-bg">
-          <div className="max-w-lg mx-auto pb-safe-bottom">
-            <div className="relative flex items-end h-[52px]">
-              {/* 左：首页 */}
-              <button className="nav-tab nav-tab-active flex-1" aria-label="首页">
-                <CalendarDays size={22} strokeWidth={1.6} />
-                <span className="nav-tab-label">首页</span>
-              </button>
-
-              {/* 左：回顾 */}
-              <button onClick={() => navigate('/review')} className="nav-tab flex-1" aria-label="回顾">
-                <BarChart3 size={22} strokeWidth={1.6} />
-                <span className="nav-tab-label">回顾</span>
-              </button>
-
-              {/* 中间占位（给 FAB 留空间） */}
-              <div className="flex-1" />
-
-              {/* 右：设置 */}
-              <button onClick={() => navigate('/settings')} className="nav-tab flex-1" aria-label="设置">
-                <Settings size={22} strokeWidth={1.6} />
-                <span className="nav-tab-label">设置</span>
-              </button>
-
-              {/* 中间凸起 FAB — 绝对定位于导航栏正中央 */}
-              {(() => {
-                const hasDiary = !!selectedDiary;
-                if (hasDiary) {
-                  return (
-                    <button
-                      key={`fab-view-${selectedDate}`}
-                      onClick={() => navigate(`/diary?date=${selectedDate}`)}
-                      className="nav-fab nav-fab-view"
-                      aria-label="查看日记"
-                    >
-                      <Eye size={23} strokeWidth={1.8} />
-                    </button>
-                  );
-                } else {
-                  return (
-                    <button
-                      key={`fab-edit-${selectedDate}`}
-                      onClick={() => navigate(`/edit?date=${selectedDate}`)}
-                      className="nav-fab"
-                      aria-label="记录日记"
-                    >
-                      <Plus size={28} strokeWidth={2} />
-                    </button>
-                  );
-                }
-              })()}
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* 右下角浮动操作按钮 */}
+      {(() => {
+        const hasDiary = !!selectedDiary;
+        if (hasDiary) {
+          return (
+            <button
+              key={`fab-view-${selectedDate}`}
+              onClick={() => navigate(`/diary?date=${selectedDate}`)}
+              className="home-fab home-fab-view"
+              aria-label="查看日记"
+            >
+              <Eye size={22} strokeWidth={1.8} />
+            </button>
+          );
+        } else {
+          return (
+            <button
+              key={`fab-edit-${selectedDate}`}
+              onClick={() => navigate(`/edit?date=${selectedDate}`)}
+              className="home-fab"
+              aria-label="记录日记"
+            >
+              <Plus size={26} strokeWidth={2.2} />
+            </button>
+          );
+        }
+      })()}
     </div>
   );
 }
@@ -265,17 +246,18 @@ function DiaryCard({ diary, isToday, onClick }: { diary: DiaryEntry; isToday: bo
   const weekday = getWeekday(diary.date);
 
   const parts: string[] = [];
-  if (diary.work.trim()) parts.push(diary.work.trim().split(/[,，、\n]/)[0]);
-  if (diary.study.trim()) parts.push(diary.study.trim().split(/[,，、\n]/)[0]);
-  if (diary.expense.trim()) parts.push(diary.expense.trim().split(/[,，、\n]/)[0]);
+  if (diary.events?.trim()) parts.push(diary.events.trim().split(/[,，、\n]/)[0]);
+  if (diary.ideas?.trim()) parts.push(diary.ideas.trim().split(/[,，、\n]/)[0]);
+  if (diary.food?.trim()) parts.push(diary.food.trim().split(/[,，、\n]/)[0]);
   const summary = parts.join(' · ') || '日记已保存';
 
   let filledCount = 0;
-  if (diary.work.trim()) filledCount++;
-  if (diary.study.trim()) filledCount++;
-  if (diary.fitness.trim()) filledCount++;
-  if (diary.expense.trim()) filledCount++;
-  if (diary.mood.trim()) filledCount++;
+  if (diary.events?.trim()) filledCount++;
+  if (diary.food?.trim()) filledCount++;
+  if (diary.ideas?.trim()) filledCount++;
+  if (diary.reading?.trim()) filledCount++;
+  if (diary.work?.trim()) filledCount++;
+  if (diary.mood?.trim()) filledCount++;
   if (diary.wakeUp || diary.sleep) filledCount++;
 
   return (
@@ -296,7 +278,7 @@ function DiaryCard({ diary, isToday, onClick }: { diary: DiaryEntry; isToday: bo
             {summary}
           </p>
           <div className="flex items-center gap-3 text-[11px] text-[var(--color-text-hint)] font-medium">
-            <span className="bg-[var(--color-bg)] px-2 py-0.5 rounded-md">{filledCount}/6</span>
+            <span className="bg-[var(--color-bg)] px-2 py-0.5 rounded-md">{filledCount}/7</span>
             {diary.wakeUp && diary.sleep && (
               <span>{diary.wakeUp} 起 · {diary.sleep} 睡</span>
             )}

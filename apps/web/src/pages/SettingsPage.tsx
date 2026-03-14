@@ -4,7 +4,7 @@ import { ChevronLeft, Copy, Download, Check, Trash2 } from 'lucide-react';
 import { exportAllDiaries, getAllDiaries } from '@/services/diaryService';
 import { db } from '@/services/db';
 
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '3.0.0';
 
 export default function SettingsPage() {
   const navigate = useNavigate();
@@ -79,12 +79,12 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-[var(--color-bg)]">
       {/* 顶部 */}
       <header className="glass-header sticky top-0 z-30">
-        <div className="flex items-center justify-between px-4 h-14">
-          <button onClick={() => navigate('/')} className="w-10 h-10 rounded-xl flex items-center justify-center text-[var(--color-text-secondary)] active:text-[var(--color-text)] active:bg-[var(--color-bg)] transition-all">
-            <ChevronLeft size={22} strokeWidth={2} />
+        <div className="max-w-lg mx-auto flex items-center justify-between px-5 h-14">
+          <button onClick={() => navigate('/')} className="header-icon-btn">
+            <ChevronLeft size={20} strokeWidth={2} />
           </button>
           <div className="text-[15px] font-bold text-[var(--color-text)] tracking-wider">设置</div>
-          <div className="w-10" />
+          <div className="w-[38px]" />
         </div>
       </header>
 
@@ -176,10 +176,7 @@ export default function SettingsPage() {
             </div>
             <div className="divider" />
             <div className="text-[var(--color-text-hint)]">
-              纯前端 PWA · 数据存在本地浏览器 · 不上传任何服务器
-            </div>
-            <div className="text-[var(--color-text-hint)]">
-              JifyLife — P人也能变J人
+              纯前端 PWA · 数据存在本地 · 不上传服务器
             </div>
           </div>
         </div>

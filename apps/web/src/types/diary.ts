@@ -2,21 +2,29 @@
  * 马伯庸式人生日记 - 数据类型定义
  */
 
-/** 单日日记数据 */
+/**
+ * 单日日记数据
+ *
+ * 字段体系遵循马伯庸日记体例：
+ * 「所遇何事、所见何人、所读何书，皆是日常直录。
+ *   细大必书，积玉碎金，以记事为要，文辞次之，多记录，少议论。」
+ */
 export interface DiaryEntry {
   /** 日期 yyyy-MM-dd */
   date: string;
   /** 天气 */
   weather: string;
-  /** 工作 */
+  /** 今日事 — 所遇何事、所见何人：发生了什么、去了哪、见了谁 */
+  events: string;
+  /** 吃喝 — 日常直录：吃了什么、喝了什么 */
+  food: string;
+  /** 灵感 — 积玉碎金：冷知识、有趣发现、突发奇想 */
+  ideas: string;
+  /** 读了什么 — 所读何书：书、文章、播客、视频 */
+  reading: string;
+  /** 工作 — 以记事为要 */
   work: string;
-  /** 学习 */
-  study: string;
-  /** 运动健康 */
-  fitness: string;
-  /** 生活消费 */
-  expense: string;
-  /** 心情感悟 */
+  /** 心情 — 少议论：偶尔记，不强制 */
   mood: string;
   /** 起床时间 HH:mm */
   wakeUp: string;
@@ -54,12 +62,13 @@ export interface SleepStats {
   totalDays: number;
 }
 
-/** 事务统计 */
+/** 记录统计 */
 export interface TaskStats {
+  totalEvents: number;
+  totalFood: number;
+  totalIdeas: number;
+  totalReading: number;
   totalWork: number;
-  totalStudy: number;
-  totalFitness: number;
-  totalExpense: number;
   totalMood: number;
 }
 
@@ -93,11 +102,16 @@ export const WEATHER_OPTIONS = [
   { label: '风', icon: '💨' },
 ] as const;
 
-/** 输入字段定义 */
+/**
+ * 输入字段定义 — 马伯庸式流水账：以记事为要，多记录少议论
+ *
+ * 「一事一条，所读何书，所见何人，所遇何事，皆是日常直录。」
+ */
 export const DIARY_FIELDS = [
-  { key: 'work' as const, label: '工作', placeholder: '开会、写需求、整理文档…', icon: '💼' },
-  { key: 'study' as const, label: '学习', placeholder: '读书、网课、新技能…', icon: '📖' },
-  { key: 'fitness' as const, label: '运动健康', placeholder: '跑步、健身、早睡早起…', icon: '💪' },
-  { key: 'expense' as const, label: '生活消费', placeholder: '咖啡、午饭、买了什么…', icon: '🛒' },
-  { key: 'mood' as const, label: '心情感悟', placeholder: '今天的感受、想说的话…', icon: '💭' },
+  { key: 'events' as const, label: '今日事', placeholder: '发生了什么、去了哪、见了谁…', icon: '📝' },
+  { key: 'food' as const, label: '吃喝', placeholder: '早午晚饭、咖啡奶茶…', icon: '🍽️' },
+  { key: 'ideas' as const, label: '灵感', placeholder: '冷知识、有趣发现、突发奇想…', icon: '💡' },
+  { key: 'reading' as const, label: '读了什么', placeholder: '书、文章、播客、视频…', icon: '📖' },
+  { key: 'work' as const, label: '工作', placeholder: '开会、写需求、处理事务…', icon: '💼' },
+  { key: 'mood' as const, label: '心情', placeholder: '感受、想法、一句话…', icon: '🌙' },
 ] as const;

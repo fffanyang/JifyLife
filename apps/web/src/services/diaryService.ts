@@ -65,28 +65,33 @@ export function generateMarkdown(entry: DiaryEntry): string {
   lines.push(`# ${entry.date} ${weekday} ${entry.weather}`);
   lines.push('');
 
-  if (entry.work.trim()) {
+  if (entry.events?.trim()) {
+    lines.push('## 今日事');
+    lines.push(entry.events.trim());
+    lines.push('');
+  }
+  if (entry.food?.trim()) {
+    lines.push('## 吃喝');
+    lines.push(entry.food.trim());
+    lines.push('');
+  }
+  if (entry.ideas?.trim()) {
+    lines.push('## 灵感');
+    lines.push(entry.ideas.trim());
+    lines.push('');
+  }
+  if (entry.reading?.trim()) {
+    lines.push('## 读了什么');
+    lines.push(entry.reading.trim());
+    lines.push('');
+  }
+  if (entry.work?.trim()) {
     lines.push('## 工作');
     lines.push(entry.work.trim());
     lines.push('');
   }
-  if (entry.study.trim()) {
-    lines.push('## 学习');
-    lines.push(entry.study.trim());
-    lines.push('');
-  }
-  if (entry.fitness.trim()) {
-    lines.push('## 运动健康');
-    lines.push(entry.fitness.trim());
-    lines.push('');
-  }
-  if (entry.expense.trim()) {
-    lines.push('## 生活消费');
-    lines.push(entry.expense.trim());
-    lines.push('');
-  }
-  if (entry.mood.trim()) {
-    lines.push('## 心情感悟');
+  if (entry.mood?.trim()) {
+    lines.push('## 心情');
     lines.push(entry.mood.trim());
     lines.push('');
   }
@@ -192,34 +197,36 @@ function calcSleepStats(entries: DiaryEntry[]): SleepStats {
   };
 }
 
-/** 计算事务统计 */
+/** 计算记录统计 */
 function calcTaskStats(entries: DiaryEntry[]): TaskStats {
+  let totalEvents = 0;
+  let totalFood = 0;
+  let totalIdeas = 0;
+  let totalReading = 0;
   let totalWork = 0;
-  let totalStudy = 0;
-  let totalFitness = 0;
-  let totalExpense = 0;
   let totalMood = 0;
 
   entries.forEach(e => {
-    if (e.work.trim()) totalWork += e.work.split(/[,，、;；\n]/).filter(s => s.trim()).length;
-    if (e.study.trim()) totalStudy += e.study.split(/[,，、;；\n]/).filter(s => s.trim()).length;
-    if (e.fitness.trim()) totalFitness += e.fitness.split(/[,，、;；\n]/).filter(s => s.trim()).length;
-    if (e.expense.trim()) totalExpense += e.expense.split(/[,，、;；\n]/).filter(s => s.trim()).length;
-    if (e.mood.trim()) totalMood += e.mood.split(/[,，、;；\n]/).filter(s => s.trim()).length;
+    if (e.events?.trim()) totalEvents += e.events.split(/[,，、;；\n]/).filter(s => s.trim()).length;
+    if (e.food?.trim()) totalFood += e.food.split(/[,，、;；\n]/).filter(s => s.trim()).length;
+    if (e.ideas?.trim()) totalIdeas += e.ideas.split(/[,，、;；\n]/).filter(s => s.trim()).length;
+    if (e.reading?.trim()) totalReading += e.reading.split(/[,，、;；\n]/).filter(s => s.trim()).length;
+    if (e.work?.trim()) totalWork += e.work.split(/[,，、;；\n]/).filter(s => s.trim()).length;
+    if (e.mood?.trim()) totalMood += e.mood.split(/[,，、;；\n]/).filter(s => s.trim()).length;
   });
 
-  return { totalWork, totalStudy, totalFitness, totalExpense, totalMood };
+  return { totalEvents, totalFood, totalIdeas, totalReading, totalWork, totalMood };
 }
 
-/** 计算生活统计 */
+/** 计算生活统计（高频吃喝） */
 function calcLifeStats(entries: DiaryEntry[]): LifeStats {
   const freq: Record<string, number> = {};
   let totalDays = 0;
 
   entries.forEach(e => {
-    if (!e.expense.trim()) return;
+    if (!e.food?.trim()) return;
     totalDays++;
-    e.expense.split(/[,，、;；\n]/).forEach(item => {
+    e.food.split(/[,，、;；\n]/).forEach(item => {
       const t = item.trim();
       if (t) freq[t] = (freq[t] || 0) + 1;
     });
@@ -239,24 +246,27 @@ function generateSummary(entries: DiaryEntry[], taskStats: TaskStats, sleepStats
 
   if (entries.length === 0) return '这段时间暂无日记记录。';
 
+  if (taskStats.totalEvents > 0) {
+    parts.push(`记了 ${taskStats.totalEvents} 件事`);
+  }
+  if (taskStats.totalIdeas > 0) {
+    parts.push(`攒了 ${taskStats.totalIdeas} 条灵感`);
+  }
+  if (taskStats.totalReading > 0) {
+    parts.push(`读了 ${taskStats.totalReading} 样东西`);
+  }
   if (taskStats.totalWork > 0) {
     parts.push(`处理了 ${taskStats.totalWork} 项工作`);
-  }
-  if (taskStats.totalStudy > 0) {
-    parts.push(`学习了 ${taskStats.totalStudy} 项内容`);
-  }
-  if (taskStats.totalFitness > 0) {
-    parts.push(`运动健康 ${taskStats.totalFitness} 次`);
   }
   if (sleepStats.totalDays > 0 && sleepStats.avgDuration !== '--') {
     parts.push(`平均睡 ${sleepStats.avgDuration}`);
   }
 
   if (parts.length === 0) {
-    return `记录了 ${entries.length} 天的生活，虽平淡却真实。`;
+    return `记录了 ${entries.length} 天，细大必书，积玉碎金。`;
   }
 
-  return parts.join('，') + '。生活充实，继续加油。';
+  return parts.join('，') + '。日常直录，聊以自娱。';
 }
 
 // ========== 回顾数据生成 ==========
