@@ -79,39 +79,40 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-[var(--color-bg)]">
       {/* 顶部 */}
       <header className="glass-header sticky top-0 z-30">
-        <div className="flex items-center justify-between px-4 h-13">
-          <button onClick={() => navigate('/')} className="p-2 text-[var(--color-text-secondary)] active:text-[var(--color-text)] -ml-1">
-            <ChevronLeft size={22} />
+        <div className="flex items-center justify-between px-4 h-14">
+          <button onClick={() => navigate('/')} className="w-10 h-10 rounded-xl flex items-center justify-center text-[var(--color-text-secondary)] active:text-[var(--color-text)] active:bg-[var(--color-bg)] transition-all">
+            <ChevronLeft size={22} strokeWidth={2} />
           </button>
-          <div className="text-[14px] font-semibold text-[var(--color-text)]">设置</div>
-          <div className="w-9" />
+          <div className="text-[15px] font-bold text-[var(--color-text)] tracking-wider">设置</div>
+          <div className="w-10" />
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-5 py-5 space-y-4">
+      <main className="max-w-lg mx-auto px-5 py-6 space-y-4">
         {/* 数据存储 */}
-        <div className="card p-5 animate-slide-up">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-8 h-8 bg-[var(--color-accent)] bg-opacity-10 rounded-xl flex items-center justify-center">
-              <span className="text-[14px]">💾</span>
+        <div className="card-static p-5 animate-slide-up">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-[12px] bg-[var(--color-accent-soft)] flex items-center justify-center">
+              <span className="text-[15px]">💾</span>
             </div>
             <div>
-              <span className="text-[14px] font-semibold text-[var(--color-text)]">数据存储</span>
+              <span className="text-[14px] font-bold text-[var(--color-text)]">数据存储</span>
               {diaryCount !== null && (
-                <div className="text-[11px] text-[var(--color-text-muted)]">已记录 {diaryCount} 篇日记</div>
+                <div className="text-[11px] text-[var(--color-text-muted)] font-medium mt-0.5">已记录 {diaryCount} 篇日记</div>
               )}
             </div>
           </div>
 
-          <div className="text-[11px] text-[var(--color-text-muted)] mb-1.5 font-medium">存储位置</div>
-          <div className="text-[13px] text-[var(--color-text)] bg-[var(--color-bg)] rounded-xl p-3.5 font-mono break-all mb-3 leading-relaxed"
-               style={{ border: '1px solid rgba(44,37,32,0.05)' }}>
-            {storagePath}
+          <div className="text-[11px] text-[var(--color-text-muted)] mb-2 font-semibold tracking-wider">存储位置</div>
+          <div className="input-field px-4 py-3 mb-3">
+            <div className="text-[13px] text-[var(--color-text)] font-mono break-all leading-relaxed">
+              {storagePath}
+            </div>
           </div>
 
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 text-[13px] text-[var(--color-accent)] active:opacity-70 font-medium"
+            className="flex items-center gap-2 text-[13px] text-[var(--color-accent)] active:opacity-70 font-semibold"
           >
             {copied ? <Check size={14} className="text-[var(--color-success)]" /> : <Copy size={14} />}
             <span>{copied ? '已复制' : '复制路径'}</span>
@@ -119,65 +120,67 @@ export default function SettingsPage() {
         </div>
 
         {/* 导出日记 */}
-        <div className="card p-5 animate-slide-up" style={{ animationDelay: '50ms' }}>
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-8 h-8 bg-[var(--color-success)] bg-opacity-10 rounded-xl flex items-center justify-center">
-              <Download size={15} className="text-[var(--color-success)]" />
+        <div className="card-static p-5 animate-slide-up" style={{ animationDelay: '60ms' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-[12px] bg-[var(--color-success-soft)] flex items-center justify-center">
+              <Download size={16} className="text-[var(--color-success)]" strokeWidth={2} />
             </div>
-            <span className="text-[14px] font-semibold text-[var(--color-text)]">导出日记</span>
+            <span className="text-[14px] font-bold text-[var(--color-text)]">导出日记</span>
           </div>
-          <p className="text-[12px] text-[var(--color-text-muted)] mb-4 leading-relaxed">
-            导出所有日记为 Markdown 文件和图片索引 (index.json)，可用于备份和迁移。
+          <p className="text-[12px] text-[var(--color-text-muted)] mb-4 leading-relaxed font-medium">
+            导出所有日记为 Markdown 文件和图片索引，可用于备份和迁移。
           </p>
           <button
             onClick={handleExport}
             disabled={exporting}
-            className={`w-full py-3 rounded-xl text-[13px] font-semibold transition-all active:scale-[0.98] ${
+            className={`w-full py-3.5 rounded-[var(--radius-button)] text-[13px] font-bold transition-all active:scale-[0.98] tracking-wide ${
               exportDone
-                ? 'bg-[var(--color-success)] bg-opacity-10 text-[var(--color-success)]'
+                ? 'bg-[var(--color-success-soft)] text-[var(--color-success)] border border-[rgba(94,158,110,0.15)]'
                 : exporting
-                ? 'bg-[var(--color-bg)] text-[var(--color-text-muted)]'
-                : 'bg-[var(--color-brand)] text-white'
+                ? 'bg-[var(--color-bg)] text-[var(--color-text-hint)]'
+                : 'bg-[var(--color-brand)] text-white shadow-[0_2px_8px_rgba(26,22,20,0.12)]'
             }`}
-            style={{ border: exportDone ? '1px solid rgba(107,158,120,0.2)' : 'none' }}
           >
             {exportDone ? '导出完成' : exporting ? '导出中…' : '导出完整日记'}
           </button>
         </div>
 
         {/* 危险区域 */}
-        <div className="card p-5 animate-slide-up" style={{ animationDelay: '100ms', border: '1px solid rgba(199,92,92,0.08)' }}>
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-8 h-8 bg-[var(--color-danger)] bg-opacity-10 rounded-xl flex items-center justify-center">
-              <Trash2 size={15} className="text-[var(--color-danger)]" />
+        <div className="card-static p-5 animate-slide-up" style={{ animationDelay: '120ms', border: '1px solid rgba(196,84,84,0.06)' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-[12px] bg-[var(--color-danger-soft)] flex items-center justify-center">
+              <Trash2 size={16} className="text-[var(--color-danger)]" strokeWidth={2} />
             </div>
-            <span className="text-[14px] font-semibold text-[var(--color-danger)]">危险操作</span>
+            <span className="text-[14px] font-bold text-[var(--color-danger)]">危险操作</span>
           </div>
           <button
             onClick={handleClearAll}
-            className="w-full py-3 rounded-xl text-[13px] font-semibold bg-[var(--color-danger)] bg-opacity-5 text-[var(--color-danger)] active:bg-opacity-15 transition-all active:scale-[0.98]"
-            style={{ border: '1px solid rgba(199,92,92,0.15)' }}
+            className="w-full py-3.5 rounded-[var(--radius-button)] text-[13px] font-bold bg-[var(--color-danger-soft)] text-[var(--color-danger)] active:opacity-80 transition-all active:scale-[0.98] tracking-wide border border-[rgba(196,84,84,0.1)]"
           >
             清除所有数据
           </button>
         </div>
 
         {/* 关于 */}
-        <div className="card p-5 animate-slide-up" style={{ animationDelay: '150ms' }}>
-          <div className="flex items-center gap-2.5 mb-3">
-            <div className="w-8 h-8 bg-[var(--color-bg)] rounded-xl flex items-center justify-center">
-              <span className="text-[14px]">ℹ️</span>
+        <div className="card-static p-5 animate-slide-up" style={{ animationDelay: '180ms' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-[12px] bg-[var(--color-bg)] flex items-center justify-center border border-[rgba(26,22,20,0.05)]">
+              <span className="text-[15px]">ℹ️</span>
             </div>
-            <span className="text-[14px] font-semibold text-[var(--color-text)]">关于</span>
+            <span className="text-[14px] font-bold text-[var(--color-text)]">关于</span>
           </div>
-          <div className="space-y-2 text-[12px] text-[var(--color-text-muted)] leading-relaxed">
+          <div className="space-y-3 text-[12px] text-[var(--color-text-muted)] leading-relaxed font-medium">
             <div className="flex items-center justify-between">
               <span>版本</span>
-              <span className="text-[var(--color-text-secondary)] font-medium">v{APP_VERSION}</span>
+              <span className="text-[var(--color-text-secondary)] font-bold">v{APP_VERSION}</span>
             </div>
             <div className="divider" />
-            <div>纯前端 PWA · 数据存在本地浏览器 · 不上传任何服务器</div>
-            <div>设计灵感：马伯庸日常碎碎念 × 极简J人管理系统</div>
+            <div className="text-[var(--color-text-hint)]">
+              纯前端 PWA · 数据存在本地浏览器 · 不上传任何服务器
+            </div>
+            <div className="text-[var(--color-text-hint)]">
+              JifyLife — P人也能变J人
+            </div>
           </div>
         </div>
       </main>
