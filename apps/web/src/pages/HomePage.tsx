@@ -200,59 +200,57 @@ export default function HomePage() {
 
       {/* 底部导航栏 */}
       <nav className="fixed bottom-0 left-0 right-0 z-20">
-        <div className="bg-[var(--color-card)] border-t border-[rgba(26,22,20,0.06)]">
+        <div className="nav-bar-bg">
           <div className="max-w-lg mx-auto pb-safe-bottom">
-            <div className="relative flex items-end h-14">
-              {/* 首页 */}
+            <div className="relative flex items-end h-[52px]">
+              {/* 左：首页 */}
               <button className="nav-tab nav-tab-active flex-1" aria-label="首页">
-                <CalendarDays size={21} strokeWidth={1.7} />
-                <span className="text-[10px] font-semibold mt-0.5">首页</span>
+                <CalendarDays size={22} strokeWidth={1.6} />
+                <span className="nav-tab-label">首页</span>
               </button>
 
-              {/* 回顾 */}
+              {/* 左：回顾 */}
               <button onClick={() => navigate('/review')} className="nav-tab flex-1" aria-label="回顾">
-                <BarChart3 size={21} strokeWidth={1.7} />
-                <span className="text-[10px] font-semibold mt-0.5">回顾</span>
+                <BarChart3 size={22} strokeWidth={1.6} />
+                <span className="nav-tab-label">回顾</span>
               </button>
 
-              {/* 中间占位 + 凸起 FAB */}
-              <div className="relative flex-1 flex flex-col items-center justify-end h-full">
-                {(() => {
-                  const hasDiary = !!selectedDiary;
-                  if (hasDiary) {
-                    return (
-                      <button
-                        key={`fab-view-${selectedDate}`}
-                        onClick={() => navigate(`/diary?date=${selectedDate}`)}
-                        className="nav-fab nav-fab-view"
-                        aria-label="查看日记"
-                      >
-                        <Eye size={22} strokeWidth={2} />
-                      </button>
-                    );
-                  } else {
-                    return (
-                      <button
-                        key={`fab-edit-${selectedDate}`}
-                        onClick={() => navigate(`/edit?date=${selectedDate}`)}
-                        className="nav-fab"
-                        aria-label="记录日记"
-                      >
-                        <Plus size={26} strokeWidth={2.2} />
-                      </button>
-                    );
-                  }
-                })()}
-                <span className="text-[10px] font-semibold text-[var(--color-text-hint)] pb-1.5">
-                  {selectedDiary ? '查看' : '记录'}
-                </span>
-              </div>
+              {/* 中间占位（给 FAB 留空间） */}
+              <div className="flex-1" />
 
-              {/* 设置 */}
+              {/* 右：设置 */}
               <button onClick={() => navigate('/settings')} className="nav-tab flex-1" aria-label="设置">
-                <Settings size={21} strokeWidth={1.7} />
-                <span className="text-[10px] font-semibold mt-0.5">设置</span>
+                <Settings size={22} strokeWidth={1.6} />
+                <span className="nav-tab-label">设置</span>
               </button>
+
+              {/* 中间凸起 FAB — 绝对定位于导航栏正中央 */}
+              {(() => {
+                const hasDiary = !!selectedDiary;
+                if (hasDiary) {
+                  return (
+                    <button
+                      key={`fab-view-${selectedDate}`}
+                      onClick={() => navigate(`/diary?date=${selectedDate}`)}
+                      className="nav-fab nav-fab-view"
+                      aria-label="查看日记"
+                    >
+                      <Eye size={23} strokeWidth={1.8} />
+                    </button>
+                  );
+                } else {
+                  return (
+                    <button
+                      key={`fab-edit-${selectedDate}`}
+                      onClick={() => navigate(`/edit?date=${selectedDate}`)}
+                      className="nav-fab"
+                      aria-label="记录日记"
+                    >
+                      <Plus size={28} strokeWidth={2} />
+                    </button>
+                  );
+                }
+              })()}
             </div>
           </div>
         </div>
