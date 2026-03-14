@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PenLine, Eye, BarChart3, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { PenLine, Eye, BarChart3, Settings, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import { useDiaryStore } from '@/stores/diaryStore';
 import { getDiary, formatDate, getWeekday } from '@/services/diaryService';
 import type { DiaryEntry } from '@/types/diary';
@@ -87,11 +87,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
-      {/* 顶部标题栏 — 精致居中 */}
+      {/* 顶部标题栏 */}
       <header className="glass-header sticky top-0 z-30">
         <div className="max-w-lg mx-auto px-5 pt-safe-top">
-          <div className="flex items-center justify-between h-14">
-            <div className="w-20" />
+          <div className="flex items-center justify-center h-14">
             <div className="flex flex-col items-center">
               <h1 className="text-[16px] font-bold text-[var(--color-text)] tracking-[0.12em]">
                 人生日记
@@ -100,28 +99,12 @@ export default function HomePage() {
                 JIFYLIFE
               </span>
             </div>
-            <div className="flex items-center gap-0.5 w-20 justify-end">
-              <button
-                onClick={() => navigate('/review')}
-                className="p-2.5 text-[var(--color-text-muted)] active:text-[var(--color-text)] rounded-xl transition-colors"
-                title="回顾"
-              >
-                <BarChart3 size={19} strokeWidth={1.8} />
-              </button>
-              <button
-                onClick={() => navigate('/settings')}
-                className="p-2.5 text-[var(--color-text-muted)] active:text-[var(--color-text)] rounded-xl transition-colors"
-                title="设置"
-              >
-                <Settings size={19} strokeWidth={1.8} />
-              </button>
-            </div>
           </div>
         </div>
       </header>
 
       {/* 主内容 */}
-      <main className="flex-1 overflow-y-auto pb-28">
+      <main className="flex-1 overflow-y-auto pb-44">
         <div className="max-w-lg mx-auto px-5 py-6 space-y-5">
 
           {/* 日历卡片 */}
@@ -215,12 +198,13 @@ export default function HomePage() {
         </div>
       </main>
 
-      {/* 底部智能按钮 — 根据选中日期动态变化 */}
+      {/* 底部区域：智能按钮 + 导航栏 */}
       <div className="fixed bottom-0 left-0 right-0 z-20 pointer-events-none">
-        {/* 渐变遮罩：避免内容被按钮硬切 */}
-        <div className="h-8 bg-gradient-to-t from-[var(--color-bg)] to-transparent" />
-        <div className="bg-[var(--color-bg)] pb-safe-bottom">
-          <div className="max-w-lg mx-auto px-5 pb-6 flex flex-col items-center gap-2">
+        {/* 渐变遮罩 */}
+        <div className="h-6 bg-gradient-to-t from-[var(--color-bg)] to-transparent" />
+        <div className="bg-[var(--color-bg)] pointer-events-auto">
+          {/* 智能按钮 */}
+          <div className="max-w-lg mx-auto px-5 pb-3 flex flex-col items-center gap-1.5">
             {(() => {
               const isToday = selectedDate === today;
               const hasDiary = !!selectedDiary;
@@ -229,7 +213,6 @@ export default function HomePage() {
                 : `${parseInt(selectedDate.slice(5, 7))}月${parseInt(selectedDate.slice(8))}日`;
 
               if (hasDiary) {
-                // 生成摘要
                 const parts: string[] = [];
                 if (selectedDiary.work?.trim()) parts.push(selectedDiary.work.trim().split(/[,，、\n]/)[0]);
                 if (selectedDiary.study?.trim()) parts.push(selectedDiary.study.trim().split(/[,，、\n]/)[0]);
@@ -239,14 +222,14 @@ export default function HomePage() {
                 return (
                   <>
                     {snippet && (
-                      <p className="text-[11px] text-[var(--color-text-hint)] font-medium truncate max-w-[280px] pointer-events-auto animate-fade-in">
+                      <p className="text-[11px] text-[var(--color-text-hint)] font-medium truncate max-w-[280px] animate-fade-in">
                         {snippet}
                       </p>
                     )}
                     <button
                       key={`view-${selectedDate}`}
                       onClick={() => navigate(`/diary?date=${selectedDate}`)}
-                      className="record-btn record-btn-view pointer-events-auto animate-scale-in"
+                      className="record-btn record-btn-view animate-scale-in"
                     >
                       <Eye size={19} strokeWidth={2} className="relative z-10" />
                       <span className="relative z-10 text-[15px] font-bold tracking-[0.06em]">
@@ -260,7 +243,7 @@ export default function HomePage() {
                   <button
                     key={`edit-${selectedDate}`}
                     onClick={() => navigate(`/edit?date=${selectedDate}`)}
-                    className="record-btn pointer-events-auto animate-scale-in"
+                    className="record-btn animate-scale-in"
                   >
                     <span className="record-btn-glow" />
                     <PenLine size={19} strokeWidth={2.2} className="relative z-10" />
@@ -271,6 +254,26 @@ export default function HomePage() {
                 );
               }
             })()}
+          </div>
+
+          {/* 底部导航栏 */}
+          <div className="border-t border-[rgba(26,22,20,0.06)]">
+            <div className="max-w-lg mx-auto px-8 pb-safe-bottom">
+              <div className="flex items-center justify-around h-12">
+                <button className="nav-tab nav-tab-active" aria-label="首页">
+                  <CalendarDays size={20} strokeWidth={1.8} />
+                  <span className="text-[10px] font-semibold mt-0.5">首页</span>
+                </button>
+                <button onClick={() => navigate('/review')} className="nav-tab" aria-label="回顾">
+                  <BarChart3 size={20} strokeWidth={1.8} />
+                  <span className="text-[10px] font-semibold mt-0.5">回顾</span>
+                </button>
+                <button onClick={() => navigate('/settings')} className="nav-tab" aria-label="设置">
+                  <Settings size={20} strokeWidth={1.8} />
+                  <span className="text-[10px] font-semibold mt-0.5">设置</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
