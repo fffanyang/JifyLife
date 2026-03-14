@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PenLine, Eye, BarChart3, Settings, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
+import { Eye, BarChart3, Settings, ChevronLeft, ChevronRight, CalendarDays, Plus } from 'lucide-react';
 import { useDiaryStore } from '@/stores/diaryStore';
 import { getDiary, formatDate, getWeekday } from '@/services/diaryService';
 import type { DiaryEntry } from '@/types/diary';
@@ -104,7 +104,7 @@ export default function HomePage() {
       </header>
 
       {/* 主内容 */}
-      <main className="flex-1 overflow-y-auto pb-44">
+      <main className="flex-1 overflow-y-auto pb-28">
         <div className="max-w-lg mx-auto px-5 py-6 space-y-5">
 
           {/* 日历卡片 */}
@@ -198,85 +198,65 @@ export default function HomePage() {
         </div>
       </main>
 
-      {/* 底部区域：智能按钮 + 导航栏 */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 pointer-events-none">
-        {/* 渐变遮罩 */}
-        <div className="h-6 bg-gradient-to-t from-[var(--color-bg)] to-transparent" />
-        <div className="bg-[var(--color-bg)] pointer-events-auto">
-          {/* 智能按钮 */}
-          <div className="max-w-lg mx-auto px-5 pb-3 flex flex-col items-center gap-1.5">
-            {(() => {
-              const isToday = selectedDate === today;
-              const hasDiary = !!selectedDiary;
-              const dateLabel = isToday
-                ? '今天'
-                : `${parseInt(selectedDate.slice(5, 7))}月${parseInt(selectedDate.slice(8))}日`;
+      {/* 底部导航栏 */}
+      <nav className="fixed bottom-0 left-0 right-0 z-20">
+        <div className="bg-[var(--color-card)] border-t border-[rgba(26,22,20,0.06)]">
+          <div className="max-w-lg mx-auto pb-safe-bottom">
+            <div className="relative flex items-end h-14">
+              {/* 首页 */}
+              <button className="nav-tab nav-tab-active flex-1" aria-label="首页">
+                <CalendarDays size={21} strokeWidth={1.7} />
+                <span className="text-[10px] font-semibold mt-0.5">首页</span>
+              </button>
 
-              if (hasDiary) {
-                const parts: string[] = [];
-                if (selectedDiary.work?.trim()) parts.push(selectedDiary.work.trim().split(/[,，、\n]/)[0]);
-                if (selectedDiary.study?.trim()) parts.push(selectedDiary.study.trim().split(/[,，、\n]/)[0]);
-                if (selectedDiary.expense?.trim()) parts.push(selectedDiary.expense.trim().split(/[,，、\n]/)[0]);
-                const snippet = parts.join(' · ');
+              {/* 回顾 */}
+              <button onClick={() => navigate('/review')} className="nav-tab flex-1" aria-label="回顾">
+                <BarChart3 size={21} strokeWidth={1.7} />
+                <span className="text-[10px] font-semibold mt-0.5">回顾</span>
+              </button>
 
-                return (
-                  <>
-                    {snippet && (
-                      <p className="text-[11px] text-[var(--color-text-hint)] font-medium truncate max-w-[280px] animate-fade-in">
-                        {snippet}
-                      </p>
-                    )}
-                    <button
-                      key={`view-${selectedDate}`}
-                      onClick={() => navigate(`/diary?date=${selectedDate}`)}
-                      className="record-btn record-btn-view animate-scale-in"
-                    >
-                      <Eye size={19} strokeWidth={2} className="relative z-10" />
-                      <span className="relative z-10 text-[15px] font-bold tracking-[0.06em]">
-                        查看{dateLabel}
-                      </span>
-                    </button>
-                  </>
-                );
-              } else {
-                return (
-                  <button
-                    key={`edit-${selectedDate}`}
-                    onClick={() => navigate(`/edit?date=${selectedDate}`)}
-                    className="record-btn animate-scale-in"
-                  >
-                    <span className="record-btn-glow" />
-                    <PenLine size={19} strokeWidth={2.2} className="relative z-10" />
-                    <span className="relative z-10 text-[15px] font-bold tracking-[0.06em]">
-                      记录{dateLabel}
-                    </span>
-                  </button>
-                );
-              }
-            })()}
-          </div>
-
-          {/* 底部导航栏 */}
-          <div className="border-t border-[rgba(26,22,20,0.06)]">
-            <div className="max-w-lg mx-auto px-8 pb-safe-bottom">
-              <div className="flex items-center justify-around h-12">
-                <button className="nav-tab nav-tab-active" aria-label="首页">
-                  <CalendarDays size={20} strokeWidth={1.8} />
-                  <span className="text-[10px] font-semibold mt-0.5">首页</span>
-                </button>
-                <button onClick={() => navigate('/review')} className="nav-tab" aria-label="回顾">
-                  <BarChart3 size={20} strokeWidth={1.8} />
-                  <span className="text-[10px] font-semibold mt-0.5">回顾</span>
-                </button>
-                <button onClick={() => navigate('/settings')} className="nav-tab" aria-label="设置">
-                  <Settings size={20} strokeWidth={1.8} />
-                  <span className="text-[10px] font-semibold mt-0.5">设置</span>
-                </button>
+              {/* 中间占位 + 凸起 FAB */}
+              <div className="relative flex-1 flex flex-col items-center justify-end h-full">
+                {(() => {
+                  const hasDiary = !!selectedDiary;
+                  if (hasDiary) {
+                    return (
+                      <button
+                        key={`fab-view-${selectedDate}`}
+                        onClick={() => navigate(`/diary?date=${selectedDate}`)}
+                        className="nav-fab nav-fab-view"
+                        aria-label="查看日记"
+                      >
+                        <Eye size={22} strokeWidth={2} />
+                      </button>
+                    );
+                  } else {
+                    return (
+                      <button
+                        key={`fab-edit-${selectedDate}`}
+                        onClick={() => navigate(`/edit?date=${selectedDate}`)}
+                        className="nav-fab"
+                        aria-label="记录日记"
+                      >
+                        <Plus size={26} strokeWidth={2.2} />
+                      </button>
+                    );
+                  }
+                })()}
+                <span className="text-[10px] font-semibold text-[var(--color-text-hint)] pb-1.5">
+                  {selectedDiary ? '查看' : '记录'}
+                </span>
               </div>
+
+              {/* 设置 */}
+              <button onClick={() => navigate('/settings')} className="nav-tab flex-1" aria-label="设置">
+                <Settings size={21} strokeWidth={1.7} />
+                <span className="text-[10px] font-semibold mt-0.5">设置</span>
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      </nav>
     </div>
   );
 }

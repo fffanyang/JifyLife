@@ -401,93 +401,6 @@ input[type="time"] {
   box-shadow: 0 2px 8px rgba(26,22,20,0.15);
 }
 
-/* ===== 底部居中记录按钮 — 核心 CTA ===== */
-.record-btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  height: 56px;
-  padding: 0 40px;
-  border: none;
-  border-radius: 28px;
-  background: linear-gradient(135deg, #1A1614 0%, #3D3530 50%, #1A1614 100%);
-  background-size: 200% 200%;
-  color: white;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 300ms cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow:
-    0 4px 16px rgba(26, 22, 20, 0.25),
-    0 12px 40px rgba(26, 22, 20, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  animation: btnShimmer 4s ease-in-out infinite;
-}
-
-.record-btn:active {
-  transform: scale(0.95);
-  box-shadow:
-    0 2px 8px rgba(26, 22, 20, 0.2),
-    0 4px 16px rgba(26, 22, 20, 0.1);
-}
-
-/* 查看模式 — 柔和的琥珀金风格 */
-.record-btn-view {
-  background: linear-gradient(135deg, #F5F0E8 0%, #EDE5D8 50%, #F5F0E8 100%);
-  color: var(--color-accent);
-  box-shadow:
-    0 2px 10px rgba(156, 123, 86, 0.12),
-    0 8px 28px rgba(156, 123, 86, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(156, 123, 86, 0.12);
-}
-
-.record-btn-view:active {
-  box-shadow:
-    0 1px 4px rgba(156, 123, 86, 0.1),
-    0 2px 8px rgba(156, 123, 86, 0.06);
-}
-
-/* 琥珀金光晕效果 */
-.record-btn-glow {
-  position: absolute;
-  inset: -2px;
-  border-radius: 30px;
-  background: linear-gradient(135deg,
-    rgba(156, 123, 86, 0.4) 0%,
-    rgba(156, 123, 86, 0) 40%,
-    rgba(156, 123, 86, 0) 60%,
-    rgba(156, 123, 86, 0.3) 100%
-  );
-  opacity: 0;
-  transition: opacity 300ms ease;
-  z-index: 0;
-  animation: glowPulse 3s ease-in-out infinite;
-}
-
-.record-btn:hover .record-btn-glow,
-.record-btn:focus .record-btn-glow {
-  opacity: 1;
-}
-
-/* 移动端始终微微显示光晕 */
-@media (hover: none) {
-  .record-btn-glow {
-    opacity: 0.6;
-  }
-}
-
-@keyframes btnShimmer {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-@keyframes glowPulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.02); }
-}
-
 /* 安全区域底部 */
 .pb-safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -499,7 +412,7 @@ input[type="time"] {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4px 16px;
+  padding: 6px 16px;
   color: var(--color-text-hint);
   transition: all 200ms ease;
   border: none;
@@ -514,6 +427,45 @@ input[type="time"] {
 
 .nav-tab-active {
   color: var(--color-accent);
+}
+
+/* 中间凸起 FAB 按钮 */
+.nav-fab {
+  position: absolute;
+  left: 50%;
+  top: -22px;
+  transform: translateX(-50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  background: var(--color-brand);
+  color: white;
+  box-shadow: 0 4px 16px rgba(26, 22, 20, 0.2), 0 2px 6px rgba(26, 22, 20, 0.1);
+  transition: all 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  -webkit-tap-highlight-color: transparent;
+  z-index: 10;
+}
+
+.nav-fab:active {
+  transform: translateX(-50%) scale(0.9);
+  box-shadow: 0 2px 8px rgba(26, 22, 20, 0.15);
+}
+
+/* 查看模式 — 柔和风格 */
+.nav-fab-view {
+  background: var(--color-card);
+  color: var(--color-accent);
+  border: 2px solid rgba(156, 123, 86, 0.2);
+  box-shadow: 0 2px 12px rgba(156, 123, 86, 0.12), 0 1px 4px rgba(26, 22, 20, 0.06);
+}
+
+.nav-fab-view:active {
+  box-shadow: 0 1px 4px rgba(156, 123, 86, 0.08);
 }
 
 /* ===== 响应式适配 ===== */
